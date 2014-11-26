@@ -4,6 +4,7 @@ const globalControl = require("./globalControl");
 const playbackControl = require("./playbackControl");
 const serverControl = require("./serverControl");
 const playlistControl = require("./playlistControl");
+const databaseControl = require("./databaseControl");
 var mpcStatus = {};
 var mpcStatistics = {};
 
@@ -76,6 +77,12 @@ var onConsoleInput = function() {
                 {
                     let listTokens = tokens.slice(1);
                     playlistControl.handlePlaylistInput(listTokens);
+                    break;
+                }
+                case "db":
+                {
+                    let dbTokens = tokens.slice(1);
+                    databaseControl.handleDatabaseInput(dbTokens);
                     break;
                 }
                 default:

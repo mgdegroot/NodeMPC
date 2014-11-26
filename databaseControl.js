@@ -8,7 +8,14 @@ exports.handleDatabaseInput = function(tokens) {
     if (tokens.length > 0) {
         switch(tokens[0]) {
             case "search":
+            {
+                if (tokens.length < 2) {
+                    console.log("search requires term");
+                    return;
+                }
+                mpc_commands.searchDb(tokens[1]);
                 break;
+            }
             default:
                 break;
         }

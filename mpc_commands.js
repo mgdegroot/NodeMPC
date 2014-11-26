@@ -14,6 +14,7 @@ var isRandomPlayback = false;
 var currentPlaylist = "";
 
 exports.connect = function(port, host, callback) {
+//    socket.keepAlive(true);
     socket.connect(port, host, onConnect);
     socket.on("data", onData);
     socket.on("close", onClose);
@@ -154,8 +155,8 @@ exports.savePlaylist = function(name) {
 
 exports.searchDb = function(searchterm) {
     lastCommandSend = "search";
-    parameters = searchterm;
-    sendString(lastCommandSend, searchterm);
+    parameters = "any " + searchterm;
+    sendString(lastCommandSend, parameters);
 };
 
 var sendString = function(stringToSend, argumentsToSend) {
