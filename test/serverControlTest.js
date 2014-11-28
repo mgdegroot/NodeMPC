@@ -7,7 +7,7 @@ var mpc_commands_stub = { };
 
 var serverControl = proxyquire("../serverControl", { "mpc_commands" : mpc_commands_stub });
 mpc_commands_stub.sendString = function(var1, var2) { };
-mpc_commands_stub.connect = function(var1, var2, var3) {};
+
 
 
 describe("Server control", function() {
@@ -37,16 +37,55 @@ describe("Server control", function() {
             assert.deepEqual(serverControl.handleServerInput(["bla"]), expectedResult);
         });
         it("should return ok when connect", function() {
-            //mpc_commands_stub.sendString("", "");
-            //mpc_commands_stub.savePlaylist("test");
-            //let stub = sinon.stub(mpc_commands, "sendString");
-            //mpc_commands.savePlaylist("test");
+            mpc_commands_stub.connect = function(var1, var2, var3) {};
+
             let expectedResult = {
                 status: "ok",
                 message: ""
             };
-            serverControl.handleServerInput(["connect"], function() {});
+            let actualResult = serverControl.handleServerInput(["connect"], function() {});
+            assert.deepEqual(actualResult, expectedResult);
 
+        });
+
+        it("should return ok and connect to host when connect", function() {
+            let actualHost,
+                actualPort,
+                actualCallback;
+
+            let expectedHost = "host",
+                expectedPort = 1000,
+                expectedCallback = function(){};
+
+            mpc_commands_stub.connect = function(var1, var2, var3) {
+                actualPort = var1;
+                actualHost = var2;
+                actualCallback = var3;
+            };
+
+            let expectedResult = {
+                status: "ok",
+                message: ""
+            };
+            let actualResult = serverControl.handleServerInput(["connect", expectedHost, expectedPort], expectedCallback);
+            assert.deepEqual(actualResult, expectedResult);
+            //assert.equal(actualHost, expectedHost);
+            assert.equal(actualPort, expectedPort);
+            //assert.equal(actualCallback, expectedCallback);
+
+        });
+
+
+        it("should return ok when disconnect", function() {
+            mpc_commands_stub.disconnect = function() {};
+
+            let expectedResult = {
+                status: "ok",
+                message: ""
+            };
+            let actualResult = serverControl.handleServerInput(["disconnect"], function() {});
+
+            assert.deepEqual(actualResult, expectedResult);
         });
 
 
