@@ -159,14 +159,18 @@ exports.searchDb = function(searchterm) {
     sendString(lastCommandSend, parameters);
 };
 
+
+
 var sendString = function(stringToSend, argumentsToSend) {
     if (!isConnected || !socket) {
         console.log("Error: cannot send over a closed socket.");
         return;
     }
+
     if (argumentsToSend) {
         stringToSend += " " + argumentsToSend;
     }
+
     console.log("   <>Sending " + stringToSend);
     socket.write(stringToSend + "\n");
 };

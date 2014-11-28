@@ -1,4 +1,7 @@
 {
   "name": "NodeMpc",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "dependencies": {
+    "sinon": "^1.12.1"
+  }
 }
