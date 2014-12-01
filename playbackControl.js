@@ -14,8 +14,8 @@ exports.handlePlaybackInput = function(tokens) {
             case "play":
                 mpc_commands.play();
                 break;
-            case "pauze":
-                mpc_commands.pauze();
+            case "pause":
+                mpc_commands.pause();
                 break;
             case "stop":
                 mpc_commands.stop();
