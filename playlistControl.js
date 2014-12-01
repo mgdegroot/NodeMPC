@@ -1,6 +1,6 @@
 "use strict";
 
-const mpc_commands = require("./mpc_commands");
+const mpc_commands = require("./lib/mpc_commands");
 
 exports.handlePlaylistInput = function(tokens) {
     console.log("-----playlist-----");

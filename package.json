@@ -2,6 +2,8 @@
   "name": "NodeMpc",
   "version": "0.0.1",
   "dependencies": {
+    "a": "^0.4.6",
+    "require-from": "^0.10.0",
     "sinon": "^1.12.1"
   }
 }
