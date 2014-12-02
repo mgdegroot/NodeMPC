@@ -3,23 +3,6 @@ var assert = require("assert");
 var should = require("should");
 //var requireFrom = require("require-from");
 
-//var fakeNet = {
-//    Socket : function() {
-//        var that = this;
-//
-//        that.connect = function(port, host, onConnect) {
-//            tt = "bbbbb";
-//        };
-//        that.write = function(data) {
-//            console.log(data);
-//            dataToSend = data;
-//        };
-//        that.on = function(event, handler) {
-//            console.log("called....");
-//        };
-//    }
-//};
-
 var fakeConnection = {
     connect: function(port, host, callback, onConnect, onClose, onError, onData) {
         //console.log("fake.connect");
@@ -211,14 +194,13 @@ describe("mpc_commands", function() {
             assert.equal(fakeConnection.lastDataInWrite, expectedWrite);
         });
 
-        it ("should test evel", function() {
-            //var expectedWrite = "update\n";
+        it ("should test eval", function() {
             mpc_commands.evalExpr("currentAudioVolume = 80");
-            var res = mpc_commands.evalExpr("currentAudioVolume");
-            console.log(res);
-            //assert.equal(fakeConnection.lastDataInWrite, expectedWrite);
-        });
+            var result = mpc_commands.evalExpr("currentAudioVolume;");
+            assert.equal(result, 80);
 
+            assert.equal(process.env.NODE_ENV, "test");
+        });
     });
 
 

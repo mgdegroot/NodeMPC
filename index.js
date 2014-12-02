@@ -1,10 +1,10 @@
 "use strict";
 //const mpc_commands = require("./mpc_commands");
-const globalControl = require("./globalControl");
-const playbackControl = require("./playbackControl");
-const serverControl = require("./serverControl");
-const playlistControl = require("./playlistControl");
-const databaseControl = require("./databaseControl");
+const globalControl = require("./lib/globalControl");
+const playbackControl = require("./lib/playbackControl");
+const serverControl = require("./lib/serverControl");
+const playlistControl = require("./lib/playlistControl");
+const databaseControl = require("./lib/databaseControl");
 var mpcStatus = {};
 var mpcStatistics = {};
 

@@ -1,3 +1,51 @@
+var assert = require("assert");
+var should = require("should");
+
+var fakeConnection = {
+    connect: function(port, host, callback, onConnect, onClose, onError, onData) {
+        //console.log("fake.connect");
+        this.isConnectedValue = true;
+    },
+
+    isConnected: function() {
+        return this.isConnectedValue;
+    },
+    write: function(data) {
+        this.lastDataInWrite = data;
+        //console.log("fake.write: " + data);
+    },
+    isConnectedValue: null,
+    lastDataInWrite: null
+
+};
+
+
+var expectRequire = require("a").expectRequire;
+
+expectRequire("./connection").return(fakeConnection);
+
+var serverControl = require("../lib/serverControl");
+var mpc_commands = require("../lib/mpc_commands");
+describe("Server control", function() {
+    describe("Dummy", function() {
+        it("is dummy", function() {
+            assert.equal(true, true);
+        });
+    });
+
+    describe("handleServerInput", function() {
+        it("when connect should connect to default server", function() {
+            var input = ["connect"];
+            var callback = function() {};
+            serverControl.handleServerInput(input, callback);
+            assert.equal(mpc_commands.isConnected(), true);
+            assert.equal(fakeConnection.isConnected(), true);
+        });
+    });
+
+
+});
+
 //var proxyquire = require("proxyquire");
 //var assert = require("assert");
 //var sinon = require("sinon");
