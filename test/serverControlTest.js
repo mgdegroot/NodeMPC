@@ -1,154 +1,135 @@
+"use strict";
 var assert = require("assert");
 var should = require("should");
-
-var fakeConnection = {
-    connect: function(port, host, callback, onConnect, onClose, onError, onData) {
-        //console.log("fake.connect");
-        this.isConnectedValue = true;
+var sinon = require("sinon");
+var proxyquire = require("proxyquire");
+var mpc_commandsStub = {
+    connect : function() {
+        this.callCounters["connect"]++;
+        this.connected = true;
+        this.connectParams = arguments;
+        //console.log("connect")
     },
-
-    isConnected: function() {
-        return this.isConnectedValue;
+    disconnect : function() {
+        this.callCounters["disconnect"]++;
+        this.disconnected = true;
     },
-    write: function(data) {
-        this.lastDataInWrite = data;
-        //console.log("fake.write: " + data);
+    getStatus : function() {
+        this.callCounters["getStatus"]++;
     },
-    isConnectedValue: null,
-    lastDataInWrite: null
-
+    getStats : function() {
+        this.callCounters["getStats"]++;
+    },
+    callCounters : {
+        "connect" : 0,
+        "disconnect" : 0,
+        "getStatus" : 0,
+        "getStats" : 0
+    },
+    connected : null,
+    disconnected : null,
+    connectParams : []
 };
 
+var serverControl = proxyquire("../lib/serverControl", { "./mpc_commands": mpc_commandsStub });
 
-var expectRequire = require("a").expectRequire;
 
-expectRequire("./connection").return(fakeConnection);
 
-var serverControl = require("../lib/serverControl");
-var mpc_commands = require("../lib/mpc_commands");
-describe("Server control", function() {
-    describe("Dummy", function() {
-        it("is dummy", function() {
-            assert.equal(true, true);
+describe("With serverControl.handleInput", function() {
+    let callback = function() {};
+    let okResult = {
+        status : "ok",
+        message : ""
+    };
+    let nokResult = {
+        status : "nok",
+        message : ""
+    };
+
+    describe("When given no command", function() {
+        it("should give error object", function () {
+            nokResult.message = "No command given";
+            let actualResult = serverControl.handleInput([], callback);
+            assert.deepEqual(actualResult, nokResult);
         });
     });
 
-    describe("handleServerInput", function() {
-        it("when connect should connect to default server", function() {
-            var input = ["connect"];
-            var callback = function() {};
-            serverControl.handleServerInput(input, callback);
-            assert.equal(mpc_commands.isConnected(), true);
-            assert.equal(fakeConnection.isConnected(), true);
+    describe("When given unknown command", function() {
+        it ("should give error object", function() {
+            nokResult.message = "Unknown command";
+            let actualResult = serverControl.handleInput(["garbage"], callback);
+            assert.deepEqual(actualResult, nokResult);
         });
     });
 
+    describe("When given connect", function() {
+        it ("should connect to default", function() {
+            const expectedHost = "192.168.1.6";
+            const expectedPort = 6600;
+            let actualResult = serverControl.handleInput(["connect"], callback);
+            assert.deepEqual(actualResult, okResult);
+            assert.equal(mpc_commandsStub.connectParams[0], expectedPort);
+            assert.equal(mpc_commandsStub.connectParams[1], expectedHost);
+        });
 
+        it("should connect to specified host and port", function() {
+            const expectedHost = "127.0.0.1";
+            const expectedPort = 1234;
+
+
+            let actualResult = serverControl.handleInput(["connect", expectedHost, expectedPort], callback);
+            assert.deepEqual(actualResult, okResult);
+            assert.equal(mpc_commandsStub.connectParams[0], expectedPort);
+            assert.equal(mpc_commandsStub.connectParams[1], expectedHost);
+        });
+
+
+    });
+    describe("When given disconnect", function() {
+        it("should disconnect", function() {
+            const expectedState = true;
+            let actualResult = serverControl.handleInput(["disconnect"], callback);
+            assert.deepEqual(actualResult, okResult);
+            assert.equal(mpc_commandsStub.disconnected, expectedState);
+        });
+    });
+
+    describe("When given status", function() {
+        it ("should call getStatus()", function() {
+            const expectedCallCount = 1;
+            let actualResult = serverControl.handleInput(["status"], callback);
+            assert.deepEqual(actualResult, okResult);
+            assert.equal(mpc_commandsStub.callCounters["getStatus"], expectedCallCount);
+        });
+    });
+
+    describe("When given stats", function() {
+        it ("should call getStats()", function() {
+            const expectedCallCount = 1;
+            let actualResult = serverControl.handleInput(["stats"], callback);
+            assert.deepEqual(actualResult, okResult);
+            assert.equal(mpc_commandsStub.callCounters["getStats"], expectedCallCount);
+        });
+    });
+
+    describe("When given quit", function() {
+        it ("should call disconnect()", function() {
+            mpc_commandsStub.callCounters["disconnect"] = 0;
+            const expectedCallCount = 1;
+            let actualResult = serverControl.handleInput(["quit"], callback);
+            assert.deepEqual(actualResult, okResult);
+            assert.equal(mpc_commandsStub.callCounters["disconnect"], expectedCallCount);
+        });
+
+    });
+
+    describe("When given exit", function() {
+        it ("should call disconnect()", function() {
+            mpc_commandsStub.callCounters["disconnect"] = 0;
+            const expectedCallCount = 1;
+            let actualResult = serverControl.handleInput(["exit"], callback);
+            assert.deepEqual(actualResult, okResult);
+            assert.equal(mpc_commandsStub.callCounters["disconnect"], expectedCallCount);
+        });
+    });
 });
-
-//var proxyquire = require("proxyquire");
-//var assert = require("assert");
-//var sinon = require("sinon");
-////var mpc_commands = require("../mpc_commands");
-////var serverControl = require("../serverControl");
-//var mpc_commands_stub = { };
-//
-//var serverControl = proxyquire("../serverControl", { "mpc_commands" : mpc_commands_stub });
-//mpc_commands_stub.sendString = function(var1, var2) { };
-//
-//
-//
-//describe("Server control", function() {
-//    "use strict";
-//    describe("Module serverControl", function() {
-//
-//        it("should have a handleServerInput function", function() {
-//            assert.equal(typeof serverControl, "object");
-//            assert.equal(typeof serverControl.handleServerInput, "function");
-//        });
-//
-//        it("should return nok and message when receiving no input", function() {
-//            let expectedResult = {
-//                status: "nok",
-//                message: "No command given"
-//            };
-//
-//            assert.deepEqual(serverControl.handleServerInput(), expectedResult);
-//        });
-//
-//        it("should return nok and message when receiving unknown input", function() {
-//            let expectedResult = {
-//                status: "nok",
-//                message: "Unknown entry for src. Enter valid command"
-//            };
-//
-//            assert.deepEqual(serverControl.handleServerInput(["bla"]), expectedResult);
-//        });
-//        it("should return ok when connect", function() {
-//            mpc_commands_stub.connect = function(var1, var2, var3) {};
-//
-//            let expectedResult = {
-//                status: "ok",
-//                message: ""
-//            };
-//            let actualResult = serverControl.handleServerInput(["connect"], function() {});
-//            assert.deepEqual(actualResult, expectedResult);
-//
-//        });
-//
-//        it("should return ok and connect to host when connect", function() {
-//            let actualHost,
-//                actualPort,
-//                actualCallback;
-//
-//            let expectedHost = "host",
-//                expectedPort = 1000,
-//                expectedCallback = function(){};
-//
-//            mpc_commands_stub.connect = function(var1, var2, var3) {
-//                actualPort = var1;
-//                actualHost = var2;
-//                actualCallback = var3;
-//            };
-//
-//            let expectedResult = {
-//                status: "ok",
-//                message: ""
-//            };
-//            let actualResult = serverControl.handleServerInput(["connect", expectedHost, expectedPort], expectedCallback);
-//            assert.deepEqual(actualResult, expectedResult);
-//            //assert.equal(actualHost, expectedHost);
-//            assert.equal(actualPort, expectedPort);
-//            //assert.equal(actualCallback, expectedCallback);
-//
-//        });
-//
-//
-//        it("should return ok when disconnect", function() {
-//            mpc_commands_stub.disconnect = function() {};
-//
-//            let expectedResult = {
-//                status: "ok",
-//                message: ""
-//            };
-//            let actualResult = serverControl.handleServerInput(["disconnect"], function() {});
-//
-//            assert.deepEqual(actualResult, expectedResult);
-//        });
-//
-//
-//        //it("is a test", function() {
-//        //    let test = sinon.stub();
-//        //    assert.equal(typeof test, "function");
-//        //});
-//        //
-//        //it("is a test 42", function() {
-//        //    let test = sinon.stub().returns(42);
-//        //    assert.equal(typeof test, "function");
-//        //    assert.equal(test(), 42);
-//        //});
-//    });
-//});
-//
-//
-//

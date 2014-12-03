@@ -64,30 +64,30 @@ var onConsoleInput = function() {
                 case "srv":
                 {
                     let srvTokens = tokens.slice(1);
-                    serverControl.handleServerInput(srvTokens, commandCallback);
+                    serverControl.handleInput(srvTokens, commandCallback);
                     break;
                 }
                 case "pb":
                 {
                     let pbTokens = tokens.slice(1);
-                    playbackControl.handlePlaybackInput(pbTokens);
+                    playbackControl.handleInput(pbTokens);
                     break;
                 }
                 case "list":
                 {
                     let listTokens = tokens.slice(1);
-                    playlistControl.handlePlaylistInput(listTokens);
+                    playlistControl.handleInput(listTokens);
                     break;
                 }
                 case "db":
                 {
                     let dbTokens = tokens.slice(1);
-                    databaseControl.handleDatabaseInput(dbTokens);
+                    databaseControl.handleInput(dbTokens);
                     break;
                 }
                 default:
                     //let globalTokens = tokens.slice(1);
-                    globalControl.handleGlobalInput(tokens);
+                    globalControl.handleInput(tokens);
                     break;
             }
         }
