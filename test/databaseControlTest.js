@@ -18,9 +18,7 @@ describe("With databaseControl.handleInput", function() {
     };
 
     var rxSearchTerm = null;
-    var mpcStub = sinon.stub(mpc_commands, "searchDatabase", function(searchTerm){
-        rxSearchTerm = searchTerm;
-    });
+
 
     describe("When given no command", function() {
         it("should give error object", function () {
@@ -40,10 +38,14 @@ describe("With databaseControl.handleInput", function() {
 
     describe ("When given search with arguments", function() {
         it ("should call searchDatabase", function() {
+            var mpcStub = sinon.stub(mpc_commands, "searchDatabase", function(searchTerm){
+                rxSearchTerm = searchTerm;
+            });
             const expected = "testterm";
             var actualResult = databaseControl.handleInput(["search", expected], callback);
             assert.deepEqual(actualResult, okResult);
             assert.equal(rxSearchTerm, expected);
+            mpcStub.restore();
         });
     });
     describe ("When given search without arguments", function() {

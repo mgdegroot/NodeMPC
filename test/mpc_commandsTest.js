@@ -3,27 +3,9 @@ var assert = require("assert");
 var should = require("should");
 var connection = require("../lib/connection");
 var sinon = require("sinon");
-//var fakeConnection = {
-//    connect: function(port, host, callback, onConnect, onClose, onError, onData) {
-//        this.isConnectedValue = true;
-//    },
-//
-//    isConnected: function() {
-//        return this.isConnectedValue;
-//    },
-//    write: function(data) {
-//        this.lastDataInWrite = data;
-//    },
-//    isConnectedValue: null,
-//    lastDataInWrite: null
-//
-//};
-
 
 //var expectRequire = require("a").expectRequire;
-
 //expectRequire("./connection").return(fakeConnection);
-//require("../lib/mpc_commands");
 var mpc_commands = require("../lib/mpc_commands");
 
 describe("mpc_commands", function() {
@@ -37,6 +19,8 @@ describe("mpc_commands", function() {
             var isConnectedStub = sinon.stub(connection, "isConnected", function() {return true; });
             mpc_commands.connect(port, host, callback);
             assert.equal(mpc_commands.isConnected(), true);
+            var actualCallback = mpc_commands.evalExpr("commandCallback");
+            assert.equal(actualCallback, callback);
         });
     });
 
@@ -150,6 +134,20 @@ describe("mpc_commands", function() {
             assert.equal(actualData, expectedWrite);
         });
 
+        it ("should search", function() {
+            const expectedWrite = "search any searchterm\n";
+            const searchTerm = "searchterm";
+            mpc_commands.searchDatabase(searchTerm);
+            assert.equal(actualData, expectedWrite);
+        });
+
+        it ("should search multiple words", function() {
+            const expectedWrite = "search any searchterm and another\n";
+            const searchTerm = "searchterm and another";
+            mpc_commands.searchDatabase(searchTerm);
+            assert.equal(actualData, expectedWrite);
+        });
+
         it ("should send update directory command", function() {
             const expectedWrite= "update directory\n";
             mpc_commands.update("directory");
@@ -177,6 +175,7 @@ describe("mpc_commands", function() {
             mpc_commands.clearPlaylist();
             assert.equal(actualData, expectedWrite);
         });
+
 
         //it ("should send search command", function() {
         //    const expectedWrite= "search any searchterm\n";
