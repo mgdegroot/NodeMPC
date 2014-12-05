@@ -2,7 +2,8 @@
   "name": "NodeMpc",
   "version": "0.0.1",
   "dependencies": {
-    "winston": "^0.8.3"
+    "winston": "^0.8.3",
+    "winston-mongodb": "^0.5.3"
   },
   "devDependencies": {
     "a": "^0.4.6",
@@ -15,6 +16,7 @@
   },
   "scripts": {
     "start": "node --harmony index.js",
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --ui bdd -R spec -t 5000"
   }
 }
