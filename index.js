@@ -1,5 +1,5 @@
 "use strict";
-//const mpc_commands = require("./mpc_commands");
+const logger = require("./lib/logger");
 const globalControl = require("./lib/globalControl");
 const playbackControl = require("./lib/playbackControl");
 const serverControl = require("./lib/serverControl");
@@ -95,6 +95,8 @@ var onConsoleInput = function() {
 };
 
 process.stdin.on("readable", onConsoleInput);
-
+//winston.info("test test test");
+logger.info("test");
+logger.debug("test2");
 console.log("Enter command: ");
 process.stdout.write(">");
